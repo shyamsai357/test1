@@ -1,0 +1,255 @@
+<mat-card id="card" style="text-align: center;">
+  <mat-card-title>Compare Tool</mat-card-title>
+  <mat-card-content>
+    <form [formGroup]="compareForm" (ngSubmit)="submitCompareForm()" #resetCompareForm="ngForm" novalidate>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>ARF type</mat-label>
+        <mat-select [(value)]="ARFselected" formControlName="arf_type" [disabled]="controlReadOnly" (selectionChange)="doSomething($event)">
+          <mat-option [value]="arfArray" *ngFor="let arfArray of arfArray">{{arfArray}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="handleError('arf_type', 'required')">
+          ARF type is required!
+        </mat-error>
+        <mat-hint style="color:brown;" *ngIf="compareForm.value.arf_type == 'OTHERS'">Warning: results may not be accurate.</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="multiple-items">
+        <mat-label>File1</mat-label>
+        <input [(ngModel)]="inputValue1" matInput placeholder="Source path" formControlName="source_path" [readonly]="controlReadOnly" autocomplete="on">
+        <mat-error *ngIf="handleError('source_path', 'required')">
+          You must provide a path for File1 !
+        </mat-error>
+        <mat-error *ngIf="handleError('source_path', 'pattern')">
+          File1 Path should be AWS s3 URI
+        </mat-error>
+        <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'PARSED ARF'"
+        matTooltip="
+        Please provide s3 URI only.
+        Example path:
+        s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+         
+          For Parsed ARF, above sample path should have below folder structure.
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_parsed_inquiry/part*.bz2
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_parsed_public/part*.bz2
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_parsed_trade/part*.bz2"
+          >info</mat-icon>
+        <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'OTHERS'"
+        matTooltip="
+        Please provide s3 URI only.
+        Example path:
+         s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+         
+          For Others, above sample path should have csv files or compressed csv files.
+          2021XXXXXX_XXXXXX_XXXXXXX_OTHERS/part*.csv" 
+        >info</mat-icon>
+        <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'REGULAR ARF'"
+        matTooltip= "Please provide s3 URI only.
+        Example path:
+         s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+         
+          For Regular ARF, above sample path should have csv files or compressed csv files.     
+          2021XXXXXX_XXXXXX_XXXXXXX_REGULAR_ARF/part*.csv"
+          >info</mat-icon>
+        <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'CUSTOM ARF'"
+        matTooltip="Please provide s3 URI only.
+        Example path:
+         s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+          
+          For Custom ARF, above sample path should have csv files or compressed csv files.    
+          2021XXXXXX_XXXXXX_XXXXXXX_CUSTOM_ARF/part*.csv"
+        >info</mat-icon>
+        <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'GENERIC PARSED ARF'"
+        matTooltip="
+        Please provide s3 URI only.
+        Example path:
+        s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+        
+        For Generic Parsed ARF , above sample path should have below folder structure.
+        2021XXXXX_XXXXXXXX_XXXXXXXXX_generic_parsed_inquiry/part*.bz2
+        2021XXXXX_XXXXXXXX_XXXXXXXXX_generic_parsed_public/part*.bz2
+        2021XXXXX_XXXXXXXX_XXXXXXXXX_generic_parsed_trade/part*.bz2"
+        >info</mat-icon>
+        <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'GENERIC PARSED ARF TT'"
+        matTooltip="Please provide s3 URI only.
+          Example path:
+          s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+          
+          For Generic Parsed ARF TT, above sample path should have below folder structure.
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_generic_parsed_inquiry_trended/part*.bz2	
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_generic_parsed_public_trended/part*.bz2
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_generic_parsed_trade_trended/part*.bz2"
+          >info</mat-icon>
+          <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'PARSED CUSTOM ARF'"
+         matTooltip="Please provide s3 URI only.
+         Example path:
+         s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+          
+          For Parsed Custom ARF, above sample path should have below folder structure.
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_custom_arf/part*.bz2
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_parsed_inquiry/part*.bz2
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_parsed_public/part*.bz2
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_parsed_trade/part*.bz2"
+         >info</mat-icon>         
+      </mat-form-field>
+
+      <mat-form-field *ngIf="ARFselected !== 'OTHERS'" appearance="outline"  class="multiple-items">
+        <mat-label>File1 Caller Id</mat-label>
+        <input matInput placeholder="File1 Caller Id" formControlName="source_caller_id" [readonly]="controlReadOnly"  autocomplete="on">
+        <mat-icon class="material-icons tooltip-info"
+        matTooltip="File1 Caller Id">info</mat-icon>
+        <mat-error *ngIf="handleError('source_caller_id', 'required')">
+          You must provide a File1 Caller Id!
+        </mat-error>
+        <mat-error *ngIf="handleError('source_caller_id', 'pattern')">
+          File1 Caller Id can only have digits and '_'
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="multiple-items">
+        <mat-label>File2</mat-label>
+        <input [(ngModel)]="inputValue2" matInput placeholder="Destination path" formControlName="destination_path" [readonly]="controlReadOnly" autocomplete="on">  
+              <mat-error *ngIf="handleError('destination_path', 'required')">
+          You must provide a path for File2 !
+        </mat-error>
+        <mat-error *ngIf="handleError('destination_path', 'pattern')">
+          File2 Path should be AWS s3 URI
+        </mat-error>
+        <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'PARSED ARF'"
+        matTooltip="
+        Please provide s3 URI only.
+        Example path:
+        s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+         
+          For Parsed ARF, above sample path should have below folder structure.
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_parsed_inquiry/part*.bz2
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_parsed_public/part*.bz2
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_parsed_trade/part*.bz2"
+          >info</mat-icon>
+        <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'OTHERS'"
+        matTooltip="
+        Please provide s3 URI only.
+        Example path:
+         s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+         
+          For Others, above sample path should have csv files or compressed csv files.
+          2021XXXXXX_XXXXXX_XXXXXXX_OTHERS/part*.csv" 
+         >info</mat-icon>
+        <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'REGULAR ARF'"
+        matTooltip= "Please provide s3 URI only.
+        Example path:
+         s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+         
+          For Regular ARF, above sample path should have csv files or compressed csv files.     
+          2021XXXXXX_XXXXXX_XXXXXXX_REGULAR_ARF/part*.csv"
+          >info</mat-icon>
+        <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'CUSTOM ARF'"
+        matTooltip="Please provide s3 URI only.
+        Example path:
+         s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+          
+          For Custom ARF, above sample path should have csv files or compressed csv files.    
+          2021XXXXXX_XXXXXX_XXXXXXX_CUSTOM_ARF/part*.csv"
+        >info</mat-icon>
+
+        <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'GENERIC PARSED ARF'"
+        matTooltip="
+        Please provide s3 URI only.
+        Example path:
+        s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+        
+        For Generic Parsed ARF , above sample path should have below folder structure.
+        2021XXXXX_XXXXXXXX_XXXXXXXXX_generic_parsed_inquiry/part*.bz2
+        2021XXXXX_XXXXXXXX_XXXXXXXXX_generic_parsed_public/part*.bz2
+        2021XXXXX_XXXXXXXX_XXXXXXXXX_generic_parsed_trade/part*.bz2"
+        >info</mat-icon>
+        <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'GENERIC PARSED ARF TT'"
+        matTooltip="Please provide s3 URI only.
+          Example path:
+          s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+          
+          For Generic Parsed ARF TT, above sample path should have below folder structure.
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_generic_parsed_inquiry_trended/part*.bz2	
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_generic_parsed_public_trended/part*.bz2
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_generic_parsed_trade_trended/part*.bz2"
+          >info</mat-icon>
+          <mat-icon class="material-icons tooltip-info" *ngIf="compareForm.value.arf_type == 'PARSED CUSTOM ARF'"
+         matTooltip="Please provide s3 URI only.
+         Example path:
+         s3://<Bucket Name>/<Client Name>/<Account Number>/<Campaign Name>/<Run Instance>/arf/
+          
+          For Parsed Custom ARF, above sample path should have below folder structure.
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_custom_arf/part*.bz2
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_parsed_inquiry/part*.bz2
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_parsed_public/part*.bz2
+          2021XXXXX_XXXXXXXX_XXXXXXXXX_parsed_trade/part*.bz2"
+         >info</mat-icon>         
+      </mat-form-field>
+
+
+      <mat-form-field *ngIf="ARFselected !== 'OTHERS'" appearance="outline"  class="multiple-items">
+        <mat-label>File2 Caller Id</mat-label>
+        <input matInput placeholder="File2 Caller Id" formControlName="destination_caller_id" [readonly]="controlReadOnly"  autocomplete="on">
+        <mat-icon class="material-icons tooltip-info"
+        matTooltip="File2 Caller Id">info</mat-icon>
+        <mat-error *ngIf="handleError('destination_caller_id', 'required')">
+          You must provide a File2 Caller Id!
+        </mat-error>
+        <mat-error *ngIf="handleError('destination_caller_id', 'pattern')">
+          File1 Caller Id can only have digits and '_'
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>File type</mat-label>
+        <mat-select [(value)]="FileTypeSelected" formControlName="file_type" [disabled]="csvARFSelected()">
+          <mat-option [value]="fileTypeArray" *ngFor="let fileTypeArray of fileTypeArray">{{fileTypeArray}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="handleError('file_type', 'required')">
+          File type is required!
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field *ngIf="ARFselected === 'OTHERS' && FileTypeSelected !== 'parquet'" appearance="outline"  class="multiple-items">
+        <mat-label>Delimiter</mat-label>
+        <mat-select [(value)]="delimiterSelected" formControlName="delimiter" [disabled]="controlReadOnly">
+          <mat-option [value]="delimiterArray" *ngFor="let delimiterArray of delimiterArray">{{delimiterArray}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="handleError('delimiter', 'required')">
+          You must provide a Delimiter!
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field *ngIf="ARFselected === 'OTHERS'" appearance="outline"  class="multiple-items">
+        <mat-label>Primary column</mat-label>
+        <input matInput placeholder="Primary key" formControlName="primary_key" [readonly]="controlReadOnly"  autocomplete="on">
+        <mat-icon class="material-icons tooltip-info"
+        matTooltip="column number which is unique in both source and destination file">info</mat-icon>
+        <mat-error *ngIf="handleError('primary_key', 'required')">
+          You must provide a Primary key!
+        </mat-error>
+        <mat-error *ngIf="handleError('primary_key', 'pattern') || handleError('primary_key', 'min')">
+          Primary key should be an integer starting from 1!
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="multiple-items" ng-list>
+        <mat-label>Email list</mat-label>
+        <input matInput formControlName="emails_list" placeholder="Email Address" required [readonly]="controlReadOnly"  autocomplete="on">
+        <mat-icon class="material-icons tooltip-info"
+        matTooltip="Add multiple emails as comma-separated, no space is allowed.">info</mat-icon>
+        <mat-error>You must provide valid Email!</mat-error>
+      </mat-form-field>
+      <br>
+      <button mat-raised-button color="primary" [disabled]= "!isFormValid"
+        (click)="submitCompareForm();goToBottom();"
+        class="btn btn-primary">Submit</button>
+        &nbsp;
+        <button type = "reset" mat-raised-button color="primary"  
+        (click)="refresh();gotoTop()">Reset</button>
+    </form>
+  </mat-card-content>
+</mat-card>

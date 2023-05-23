@@ -1,0 +1,26 @@
+mat-form-field {
+    width: 50%;
+    margin: 5px;
+}
+mat-card {
+    align-items: center;
+    margin-top: 5px;
+}
+
+.multiple-items {
+    position: relative;
+  }
+
+::ng-deep .mat-tooltip {
+    max-width: unset !important;
+    white-space: pre-line !important;
+    color: yellow;
+}
+.multiple-items .tooltip-info {
+    right: 0;
+    top: 7px;
+    cursor: pointer;
+    color: #a1a7c7;
+    position: absolute;
+    font-size: 20px;
+  }

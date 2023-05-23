@@ -1,0 +1,20 @@
+.custom_header_text{
+    display: block;
+    position: absolute;
+    top: 45px;
+    left: 50px;
+    font-size: 15px;
+    color: #fff;
+    padding-bottom: 2px;
+    }
+    
+.menu-spacer{
+    flex: 1 1 auto;
+    }
+
+.mat-toolbar {
+    min-height: 60px !important;
+    height: 60px !important;
+    background: lightslategrey;
+    color:white
+}

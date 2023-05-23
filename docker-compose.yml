@@ -1,0 +1,7 @@
+version: "3.7"
+services:
+    angular-compare-tool-service:
+       container_name: angular-compare
+       build: .
+       ports:
+           - "4200:80"
