@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule} from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
+import { OktaAuthService, OKTA_CONFIG, OktaAuthModule } from '@okta/okta-angular';
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/header/header.component';
@@ -13,7 +14,14 @@ import { DataFormComponent } from './components/data-form/data-form.component';
 import { AppShellComponent } from './components/app-shell/app-shell.component';
 import { AppHeaderFormComponent } from './components/app-header-form/app-header-form.component';
 import { LoginComponent } from './components/login/login.component';
+import { environment } from '../environments/environment';
 
+const okta = environment.okta;
+const oktaConfig = {
+  clientId: okta.clientId,
+  issuer: okta.issuer,
+  redirectUri: okta.redirectUri,
+};
 
 
 @NgModule({
@@ -33,9 +41,13 @@ import { LoginComponent } from './components/login/login.component';
     ReactiveFormsModule,
     HttpClientModule,
     RouterModule,
-    AppRoutingModule
+    AppRoutingModule,
+    OktaAuthModule,
   ],
-  providers: [],
+  providers: [
+    OktaAuthService,
+    { provide: OKTA_CONFIG, useValue: oktaConfig },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
